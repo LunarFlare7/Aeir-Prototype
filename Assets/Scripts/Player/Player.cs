@@ -35,9 +35,6 @@ public class Player : MonoBehaviour
         var accelertionMultiplier = _controller.State.IsGrounded ? accelerationOnGround : accelerationInAir;
 
         _curveScanner = Mathf.MoveTowards(_curveScanner, Input.GetAxisRaw("Horizontal"), Time.deltaTime * accelertionMultiplier);
-        _curveScanner = Mathf.Clamp(_curveScanner, accelerationCurve.keys[0].time, accelerationCurve.keys[accelerationCurve.length - 1].time);
-        //accelerationCurve.Evaluate(_curveScanner) * maxSpeed
-        //Mathf.Lerp(_controller.MovementSpeed, Input.GetAxisRaw("Horizontal") * maxSpeed, Time.deltaTime * accelertionMultiplier)
         _controller.SetHorizontalSpeed(accelerationCurve.Evaluate(_curveScanner) * maxSpeed);
     }
 
