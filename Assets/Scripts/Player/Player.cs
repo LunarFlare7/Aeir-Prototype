@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
 public class Player : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class Player : MonoBehaviour
     public float accelerationInAir;
     public AnimationCurve accelerationCurve;
     private float _curveScanner;
+
+    private Vector2 _moveDir;
 
 
     [Header("Jump")]
@@ -31,11 +34,6 @@ public class Player : MonoBehaviour
     {
         HandleInputs();
         UpdateFacingDirection();
-
-        var accelertionMultiplier = _controller.State.IsGrounded ? accelerationOnGround : accelerationInAir;
-
-        _curveScanner = Mathf.MoveTowards(_curveScanner, Input.GetAxisRaw("Horizontal"), Time.deltaTime * accelertionMultiplier);
-        _controller.SetHorizontalSpeed(accelerationCurve.Evaluate(_curveScanner) * maxSpeed);
     }
 
     private void UpdateFacingDirection()
@@ -56,6 +54,10 @@ public class Player : MonoBehaviour
 
     private void HandleInputs()
     {
+        _moveDir.Set(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+
+        HandleMoveInputs();
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             _controller.Jump(jumpHeight);
@@ -65,9 +67,24 @@ public class Player : MonoBehaviour
             _controller.CutJump();
         }
 
-        if(Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.LeftShift) && (_moveDir.x != 0 || _moveDir.y != 0))
         {
-            _controller.Dash(new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")));
+            _curveScanner = 0;
+            _controller.Dash(_moveDir);
+        }
+    }
+
+    private void HandleMoveInputs()
+    {
+        var accelertionMultiplier = _controller.State.IsGrounded ? accelerationOnGround : accelerationInAir;
+        if (!_controller.State.IsDashing)
+        {
+            if (Mathf.Abs(_controller.MovementSpeed) <= maxSpeed * 1.05)
+            {
+                Debug.Log("scanner: " + _curveScanner);
+                _curveScanner = Mathf.MoveTowards(_curveScanner, _moveDir.x, Time.deltaTime * accelertionMultiplier);
+                _controller.SetHorizontalSpeed(accelerationCurve.Evaluate(_curveScanner) * maxSpeed);
+            }
         }
     }
 }

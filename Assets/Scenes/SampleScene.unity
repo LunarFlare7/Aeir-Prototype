@@ -894,12 +894,14 @@ MonoBehaviour:
     jumpBehavior: 0
     JumpReducer: 2
     JumpCooldown: 0.2
-    DashVelocity: 20
+    DashVelocity: 40
     DashCooldown: 0.5
-    TotalDashDuration: 0.8
+    TotalDashDuration: 0.3
   GroundMask:
     serializedVersion: 2
     m_Bits: 8
+  _movementSpeed: 0
+  _dragAmount: 5
 --- !u!1 &943319437
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,12 +18,15 @@ public class CharacterController2D : MonoBehaviour
     public Vector2 Velocity { get { return rb.velocity; } }
     public float MovementSpeed { get { return _movementSpeed; } }
 
+    [SerializeField]
     private float _movementSpeed;
 
     private bool _canDash;
     private float _dashTimer;
     private float _dashDuration;
     private Vector2 _dashDir;
+    [SerializeField]
+    private float _dragAmount;
 
     private bool _canJump
     {
@@ -64,7 +67,10 @@ public class CharacterController2D : MonoBehaviour
 
     void LateUpdate()
     {
+        //Always First
         UpdateState();
+
+        UpdateMovementSpeed();
 
         UpdateTimerVariables();
 
@@ -92,7 +98,7 @@ public class CharacterController2D : MonoBehaviour
 
     public void Move(Vector2 deltaMovement)
     {
-        _movementSpeed = deltaMovement.x;
+        //_movementSpeed = deltaMovement.x;
         HandleSlopes(ref deltaMovement);
         rb.velocity = deltaMovement;
     }
@@ -118,14 +124,17 @@ public class CharacterController2D : MonoBehaviour
         if (_canDash)
         {
             _dashDir = dashDir;
+            _dashDir.Normalize();
             State.IsDashing = true;
             _canDash = false;
+            Move(_dashDir * Parameters.DashVelocity);
+            SetDrag(_dragAmount);
         }
     }
 
     private void DashUpdate()
     {
-        Move((new Vector2(_dashDir.x, _dashDir.y)).normalized * Parameters.DashVelocity);
+        SetDrag(rb.drag - _dragAmount/Parameters.TotalDashDuration * Time.deltaTime);
         if (_dashDuration >= Parameters.TotalDashDuration)
         {
             EndDash();
@@ -137,6 +146,7 @@ public class CharacterController2D : MonoBehaviour
         State.IsDashing = false;
         _dashTimer = 0;
         _dashDuration = 0;
+        SetDrag(0f);
     }
 
     private void HandleSlopes(ref Vector2 deltaMovement)
@@ -152,7 +162,7 @@ public class CharacterController2D : MonoBehaviour
             Debug.DrawRay(_groundCheckPos, newPerpendicular, Color.red);
             Debug.DrawRay(_groundCheckPos, Vector2.Reflect(newPerpendicular, _slopePerpendicular), Color.red);
             deltaMovement.Set(Mathf.Abs(deltaMovement.x) * newPerpendicular.x, Mathf.Abs(deltaMovement.x) * newPerpendicular.y);
-            _movementSpeed = deltaMovement.magnitude * Mathf.Sign(deltaMovement.x);
+            //_movementSpeed = deltaMovement.magnitude * Mathf.Sign(deltaMovement.x);
         }
     }
 
@@ -217,13 +227,24 @@ public class CharacterController2D : MonoBehaviour
         {
             rb.gravityScale = Parameters.GravityScale / 3;
         }
-        else if (State.IsGrounded)
+        else if (State.IsGrounded || State.IsDashing)
         {
             rb.gravityScale = 0f;
         }
         else
         {
             rb.gravityScale = Parameters.GravityScale;
+        }
+    }
+
+    private void UpdateMovementSpeed()
+    {
+        if(State.IsOnSlope && !State.IsJumping)
+        {
+            _movementSpeed = rb.velocity.magnitude * Mathf.Sign(rb.velocity.x);
+        } else
+        {
+            _movementSpeed = rb.velocity.x;
         }
     }
 
@@ -237,5 +258,10 @@ public class CharacterController2D : MonoBehaviour
         {
             _jumpTimer += Time.deltaTime;
         }
+    }
+
+    public void SetDrag(float drag)
+    {
+        rb.drag = drag;
     }
 }
