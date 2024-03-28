@@ -197,7 +197,7 @@ public class CharacterController2D : MonoBehaviour
 
     private void SlopeCheck()
     {
-        RaycastHit2D slopeCheckHit = Physics2D.Raycast(_groundCheckPos, Vector2.down, Parameters.SlopeCheckHeight, GroundMask);
+        RaycastHit2D slopeCheckHit = Physics2D.BoxCast(_groundCheckPos, new Vector2(_collider.size.x, Parameters.GroundCheckHeight), 0, Vector2.down, Parameters.SlopeCheckHeight, GroundMask);
         if (slopeCheckHit && (State.IsGrounded || !_awayFromSlope))
         {
             State.IsGrounded = true;
