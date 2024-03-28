@@ -81,9 +81,26 @@ public class Player : MonoBehaviour
         {
             if (Mathf.Abs(_controller.MovementSpeed) <= maxSpeed * 1.05)
             {
-                Debug.Log("scanner: " + _curveScanner);
                 _curveScanner = Mathf.MoveTowards(_curveScanner, _moveDir.x, Time.deltaTime * accelertionMultiplier);
                 _controller.SetHorizontalSpeed(accelerationCurve.Evaluate(_curveScanner) * maxSpeed);
+            }
+
+            if(Mathf.Abs(_controller.MovementSpeed) > maxSpeed * 1.05)
+            {
+                _curveScanner = _controller.MovementSpeed/maxSpeed;
+                if(Mathf.Sign(_moveDir.x * _controller.MovementSpeed) == 1)
+                {
+                    _controller.SetDrag(1f);
+                }
+                else
+                {
+                    _controller.SetDrag(3f);
+                }
+                
+            }
+            else
+            {
+                _controller.SetDrag(0f);
             }
         }
     }

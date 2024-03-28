@@ -162,7 +162,6 @@ public class CharacterController2D : MonoBehaviour
             Debug.DrawRay(_groundCheckPos, newPerpendicular, Color.red);
             Debug.DrawRay(_groundCheckPos, Vector2.Reflect(newPerpendicular, _slopePerpendicular), Color.red);
             deltaMovement.Set(Mathf.Abs(deltaMovement.x) * newPerpendicular.x, Mathf.Abs(deltaMovement.x) * newPerpendicular.y);
-            //_movementSpeed = deltaMovement.magnitude * Mathf.Sign(deltaMovement.x);
         }
     }
 
