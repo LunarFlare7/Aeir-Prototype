@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class Player : MonoBehaviour
     public float accelerationOnGround;
     public float accelerationInAir;
     public AnimationCurve accelerationCurve;
+    public bool handleInput;
     private float _curveScanner;
 
     private Vector2 _moveDir;
@@ -32,7 +34,15 @@ public class Player : MonoBehaviour
 
     void Update()
     {
-        HandleInputs();
+        if (handleInput)
+        {
+            HandleInputs();
+        } else
+        {
+            Debug.Log("stopinput");
+            _moveDir = Vector2.zero;
+        }
+        HandleMovement();
         UpdateFacingDirection();
     }
 
@@ -56,8 +66,6 @@ public class Player : MonoBehaviour
     {
         _moveDir.Set(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
-        HandleMoveInputs();
-
         if (Input.GetKeyDown(KeyCode.Space))
         {
             _controller.Jump(jumpHeight);
@@ -74,7 +82,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void HandleMoveInputs()
+    private void HandleMovement()
     {
         var accelertionMultiplier = _controller.State.IsGrounded ? accelerationOnGround : accelerationInAir;
         if (!_controller.State.IsDashing)

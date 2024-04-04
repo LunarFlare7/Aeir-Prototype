@@ -21,7 +21,24 @@ public class CharacterController2D : MonoBehaviour
     [SerializeField]
     private float _movementSpeed;
 
-    private bool _canDash;
+    private bool _canDash
+    {
+        get
+        {
+            if (_dashTimer >= Parameters.DashCooldown && !State.IsDashing)
+            {
+                if (Parameters.dashBehavior == ControllerParameters2D.DashBehavior.ground && State.IsGrounded)
+                {
+                    return true;
+                }
+                if (Parameters.dashBehavior == ControllerParameters2D.DashBehavior.anywhere)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
     private float _dashTimer;
     private float _dashDuration;
     private Vector2 _dashDir;
@@ -32,12 +49,16 @@ public class CharacterController2D : MonoBehaviour
     {
         get
         {
-            if (Parameters.jumpBehavior == ControllerParameters2D.JumpBehavior.ground && State.IsGrounded)
+            if (_jumpTimer >= Parameters.JumpCooldown)
             {
-                return true;
-            } else if (Parameters.jumpBehavior == ControllerParameters2D.JumpBehavior.anywhere && _jumpTimer >= Parameters.JumpCooldown)
-            {
-                return true;
+                if (Parameters.jumpBehavior == ControllerParameters2D.JumpBehavior.ground && State.IsGrounded)
+                {
+                    return true;
+                }
+                else if (Parameters.jumpBehavior == ControllerParameters2D.JumpBehavior.anywhere)
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -74,11 +95,6 @@ public class CharacterController2D : MonoBehaviour
 
         UpdateTimerVariables();
 
-        if (State.IsGrounded && _dashTimer >= Parameters.DashCooldown && !State.IsDashing)
-        {
-            _canDash = true;
-        }
-
         if(State.IsDashing)
         {
             DashUpdate();
@@ -98,7 +114,6 @@ public class CharacterController2D : MonoBehaviour
 
     public void Move(Vector2 deltaMovement)
     {
-        //_movementSpeed = deltaMovement.x;
         HandleSlopes(ref deltaMovement);
         rb.velocity = deltaMovement;
     }
@@ -126,7 +141,6 @@ public class CharacterController2D : MonoBehaviour
             _dashDir = dashDir;
             _dashDir.Normalize();
             State.IsDashing = true;
-            _canDash = false;
             Move(_dashDir * Parameters.DashVelocity);
             SetDrag(_dragAmount);
         }
@@ -154,6 +168,16 @@ public class CharacterController2D : MonoBehaviour
         if (State.IsOnSlope && !State.IsJumping)
         {
             Vector2 newPerpendicular = Mathf.Sign(deltaMovement.x) * -_slopePerpendicular;
+            if (Vector2.Angle(newPerpendicular, Math.Sign(deltaMovement.x)*Vector2.right) > Parameters.SlopeLimit) {
+                //if(newPerpendicular.y < 0f)
+                //{
+                    //newPerpendicular *= -1;
+                //}
+                //deltaMovement.Set(newPerpendicular.x * Physics2D.gravity.y, newPerpendicular.y * Physics2D.gravity.y);
+                //Debug.DrawRay(_transform.position, -newPerpendicular);
+                Debug.Log("too steep");
+                //return;
+            }
             if (!State.IsGrounded)
             {
                 newPerpendicular = ((Mathf.Sign(deltaMovement.x) * -_slopePerpendicular) + (-_slopeNormal * Parameters.SlopeStickForceMultiplier)).normalized;
@@ -204,6 +228,7 @@ public class CharacterController2D : MonoBehaviour
             _slopeNormal = slopeCheckHit.normal;
             _slopePerpendicular = Vector2.Perpendicular(_slopeNormal).normalized;
             State.SlopeAngle = Vector2.Angle(_slopeNormal, Vector2.up);
+            Debug.Log(State.SlopeAngle);
 
             if (Math.Abs(_slopeNormal.x) > 0.01f)
             {
@@ -222,9 +247,14 @@ public class CharacterController2D : MonoBehaviour
 
     private void DecideGravityScale()
     {
+
         if (State.IsOnSlope)
         {
             rb.gravityScale = Parameters.GravityScale / 3;
+            if (State.SlopeAngle > Parameters.SlopeLimit)
+            {
+                SetHorizontalSpeed(0f);
+            }
         }
         else if (State.IsGrounded || State.IsDashing)
         {
