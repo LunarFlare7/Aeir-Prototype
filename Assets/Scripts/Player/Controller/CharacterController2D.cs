@@ -75,6 +75,9 @@ public class CharacterController2D : MonoBehaviour
     private Vector2 _groundCheckPos;
     private ControllerParameters2D _overrideParameters;
 
+    //temporary
+    public bool grounded;
+
     void Awake()
     {
         State = new ControllerState2D();
@@ -100,6 +103,8 @@ public class CharacterController2D : MonoBehaviour
             DashUpdate();
             _dashDuration += Time.deltaTime;
         }
+
+        grounded = State.IsGrounded;
     }
 
     public void SetHorizontalSpeed(float x)
@@ -168,21 +173,11 @@ public class CharacterController2D : MonoBehaviour
         if (State.IsOnSlope && !State.IsJumping)
         {
             Vector2 newPerpendicular = Mathf.Sign(deltaMovement.x) * -_slopePerpendicular;
-            if (Vector2.Angle(newPerpendicular, Math.Sign(deltaMovement.x)*Vector2.right) > Parameters.SlopeLimit) {
-                //if(newPerpendicular.y < 0f)
-                //{
-                    //newPerpendicular *= -1;
-                //}
-                //deltaMovement.Set(newPerpendicular.x * Physics2D.gravity.y, newPerpendicular.y * Physics2D.gravity.y);
-                //Debug.DrawRay(_transform.position, -newPerpendicular);
-                Debug.Log("too steep");
-                //return;
-            }
-            if (!State.IsGrounded)
+            if (State.SlopeAngle > Parameters.SlopeLimit)
             {
-                newPerpendicular = ((Mathf.Sign(deltaMovement.x) * -_slopePerpendicular) + (-_slopeNormal * Parameters.SlopeStickForceMultiplier)).normalized;
+                deltaMovement = rb.velocity;
+                return;
             }
-
             Debug.DrawRay(_groundCheckPos, newPerpendicular, Color.red);
             Debug.DrawRay(_groundCheckPos, Vector2.Reflect(newPerpendicular, _slopePerpendicular), Color.red);
             deltaMovement.Set(Mathf.Abs(deltaMovement.x) * newPerpendicular.x, Mathf.Abs(deltaMovement.x) * newPerpendicular.y);
@@ -228,15 +223,11 @@ public class CharacterController2D : MonoBehaviour
             _slopeNormal = slopeCheckHit.normal;
             _slopePerpendicular = Vector2.Perpendicular(_slopeNormal).normalized;
             State.SlopeAngle = Vector2.Angle(_slopeNormal, Vector2.up);
-            Debug.Log(State.SlopeAngle);
 
             if (Math.Abs(_slopeNormal.x) > 0.01f)
             {
-                State.IsOnSlope = true;
-                if (State.IsGrounded)
-                {
-                    _awayFromSlope = false;
-                }
+                State.IsOnSlope = true;       
+                _awayFromSlope = false;
             }
         }
         else
@@ -251,10 +242,6 @@ public class CharacterController2D : MonoBehaviour
         if (State.IsOnSlope)
         {
             rb.gravityScale = Parameters.GravityScale / 3;
-            if (State.SlopeAngle > Parameters.SlopeLimit)
-            {
-                SetHorizontalSpeed(0f);
-            }
         }
         else if (State.IsGrounded || State.IsDashing)
         {

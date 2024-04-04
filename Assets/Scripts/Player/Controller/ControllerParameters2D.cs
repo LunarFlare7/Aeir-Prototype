@@ -25,8 +25,7 @@ public class ControllerParameters2D
     [Header("Slopes")]
     [Range(0f, 90f)]
     public float SlopeLimit = 30f;
-    public float SlopeCheckHeight = 0.5f;
-    public float SlopeStickForceMultiplier = 0.2f;
+    public float SlopeCheckHeight = 0.1f;
 
     [Header("Jump")]
     public JumpBehavior jumpBehavior;

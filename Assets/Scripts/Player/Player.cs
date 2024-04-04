@@ -18,7 +18,6 @@ public class Player : MonoBehaviour
     public float accelerationInAir;
     public AnimationCurve accelerationCurve;
     public bool handleInput;
-    private float _curveScanner;
 
     private Vector2 _moveDir;
 
@@ -77,7 +76,6 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && (_moveDir.x != 0 || _moveDir.y != 0))
         {
-            _curveScanner = 0;
             _controller.Dash(_moveDir);
         }
     }
@@ -89,13 +87,11 @@ public class Player : MonoBehaviour
         {
             if (Mathf.Abs(_controller.MovementSpeed) <= maxSpeed * 1.05)
             {
-                _curveScanner = Mathf.MoveTowards(_curveScanner, _moveDir.x, Time.deltaTime * accelertionMultiplier);
-                _controller.SetHorizontalSpeed(accelerationCurve.Evaluate(_curveScanner) * maxSpeed);
+                _controller.SetHorizontalSpeed(Mathf.MoveTowards(_controller.MovementSpeed, _moveDir.x * maxSpeed, Time.deltaTime * accelertionMultiplier));
             }
 
             if(Mathf.Abs(_controller.MovementSpeed) > maxSpeed * 1.05)
             {
-                _curveScanner = _controller.MovementSpeed/maxSpeed;
                 if(Mathf.Sign(_moveDir.x * _controller.MovementSpeed) == 1)
                 {
                     _controller.SetDrag(1f);
