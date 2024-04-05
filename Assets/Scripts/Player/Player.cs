@@ -16,7 +16,6 @@ public class Player : MonoBehaviour
     public float maxSpeed;
     public float accelerationOnGround;
     public float accelerationInAir;
-    public AnimationCurve accelerationCurve;
     public bool handleInput;
 
     private Vector2 _moveDir;
@@ -38,7 +37,6 @@ public class Player : MonoBehaviour
             HandleInputs();
         } else
         {
-            Debug.Log("stopinput");
             _moveDir = Vector2.zero;
         }
         HandleMovement();
@@ -69,7 +67,7 @@ public class Player : MonoBehaviour
         {
             _controller.Jump(jumpHeight);
         }
-        else if (Input.GetKeyUp(KeyCode.Space) && _controller.State.IsJumping)
+        else if (Input.GetKeyUp(KeyCode.Space) && _controller.State.IsJumping && !_controller.State.IsDashing)
         {
             _controller.CutJump();
         }

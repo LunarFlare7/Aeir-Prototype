@@ -11,11 +11,11 @@ public class ControllerParameters2D
         disabled
     }
 
-    public enum DashBehavior
+    public enum DashRefillBehavior
     {
         ground,
-        anywhere,
-        disabled
+        infinite,
+        never
     }
 
     public float GroundCheckHeight = 0.02f;
@@ -33,9 +33,11 @@ public class ControllerParameters2D
     public float JumpCooldown = 0.2f;
 
     [Header("Dash")]
-    public DashBehavior dashBehavior;
+    public DashRefillBehavior dashBehavior;
+    public float DashAmount = 1f;
     public float DashVelocity;
     public float DashCooldown;
     public float TotalDashDuration;
+    public float DashDrag = 5f;
     
 }

@@ -1524,30 +1524,6 @@ MonoBehaviour:
   maxSpeed: 12
   accelerationOnGround: 100
   accelerationInAir: 50
-  accelerationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: -1
-      value: -1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
   handleInput: 1
   jumpHeight: 5
 --- !u!114 &886787514
@@ -1571,15 +1547,17 @@ MonoBehaviour:
     jumpBehavior: 0
     JumpReducer: 2
     JumpCooldown: 0.2
-    dashBehavior: 1
+    dashBehavior: 0
+    DashAmount: 1
     DashVelocity: 40
     DashCooldown: 0.5
     TotalDashDuration: 0.2
+    DashDrag: 5
   GroundMask:
     serializedVersion: 2
     m_Bits: 8
   _movementSpeed: 0
-  _dragAmount: 5
+  dashes: 0
   grounded: 0
 --- !u!1 &1557336791
 GameObject:

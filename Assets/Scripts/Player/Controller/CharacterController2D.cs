@@ -25,16 +25,9 @@ public class CharacterController2D : MonoBehaviour
     {
         get
         {
-            if (_dashTimer >= Parameters.DashCooldown && !State.IsDashing)
+            if (dashes > 0)
             {
-                if (Parameters.dashBehavior == ControllerParameters2D.DashBehavior.ground && State.IsGrounded)
-                {
-                    return true;
-                }
-                if (Parameters.dashBehavior == ControllerParameters2D.DashBehavior.anywhere)
-                {
-                    return true;
-                }
+                return true;
             }
             return false;
         }
@@ -43,7 +36,7 @@ public class CharacterController2D : MonoBehaviour
     private float _dashDuration;
     private Vector2 _dashDir;
     [SerializeField]
-    private float _dragAmount;
+    private float dashes;
 
     private bool _canJump
     {
@@ -70,7 +63,6 @@ public class CharacterController2D : MonoBehaviour
     private bool _awayFromSlope;
 
     private Transform _transform;
-    private Vector3 _localScale;
     private BoxCollider2D _collider;
     private Vector2 _groundCheckPos;
     private ControllerParameters2D _overrideParameters;
@@ -84,7 +76,6 @@ public class CharacterController2D : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
         _transform = transform;
-        _localScale = transform.localScale;
         _collider = GetComponent<BoxCollider2D>();
         rb.gravityScale = Parameters.GravityScale;
     }
@@ -146,14 +137,15 @@ public class CharacterController2D : MonoBehaviour
             _dashDir = dashDir;
             _dashDir.Normalize();
             State.IsDashing = true;
-            Move(_dashDir * Parameters.DashVelocity);
-            SetDrag(_dragAmount);
+            rb.velocity = _dashDir * Parameters.DashVelocity;
+            SetDrag(Parameters.DashDrag);
+            dashes -= 1;
         }
     }
 
     private void DashUpdate()
     {
-        SetDrag(rb.drag - _dragAmount/Parameters.TotalDashDuration * Time.deltaTime);
+        SetDrag(rb.drag - Parameters.DashDrag/Parameters.TotalDashDuration * Time.deltaTime);
         if (_dashDuration >= Parameters.TotalDashDuration)
         {
             EndDash();
@@ -191,6 +183,8 @@ public class CharacterController2D : MonoBehaviour
         GroundCheck();
         SlopeCheck();
 
+        DashCountUpdate();
+
         DecideGravityScale();
 
         if (rb.velocity.y <= 0.01f)
@@ -201,6 +195,21 @@ public class CharacterController2D : MonoBehaviour
         if (Mathf.Abs(rb.velocity.x) > 0.001f)
         {
             State.NormalizedMoveDirection = Mathf.Sign(rb.velocity.x);
+        }
+    }
+
+    private void DashCountUpdate()
+    {
+        if (_dashTimer >= Parameters.DashCooldown && !State.IsDashing)
+        {
+            if (Parameters.dashBehavior == ControllerParameters2D.DashRefillBehavior.ground && State.IsGrounded)
+            {
+                dashes = Parameters.DashAmount;
+            }
+            if (Parameters.dashBehavior == ControllerParameters2D.DashRefillBehavior.infinite)
+            {
+                dashes = Parameters.DashAmount;
+            }
         }
     }
 
@@ -234,6 +243,11 @@ public class CharacterController2D : MonoBehaviour
         {
             _awayFromSlope = true;
         }
+
+        if (State.SlopeAngle > Parameters.SlopeLimit)
+        {
+            State.IsGrounded = false;
+        }
     }
 
     private void DecideGravityScale()
@@ -242,6 +256,10 @@ public class CharacterController2D : MonoBehaviour
         if (State.IsOnSlope)
         {
             rb.gravityScale = Parameters.GravityScale / 3;
+            if (State.SlopeAngle > Parameters.SlopeLimit)
+            {
+                rb.gravityScale = Parameters.GravityScale;
+            }
         }
         else if (State.IsGrounded || State.IsDashing)
         {
