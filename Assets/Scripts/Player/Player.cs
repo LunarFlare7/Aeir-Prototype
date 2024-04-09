@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
 using UnityEngine.UIElements;
@@ -17,6 +18,9 @@ public class Player : MonoBehaviour
     public float accelerationOnGround;
     public float accelerationInAir;
     public bool handleInput;
+
+    [Header("Animation")]
+    public Animator ani;
 
     private Vector2 _moveDir;
 
@@ -41,6 +45,18 @@ public class Player : MonoBehaviour
         }
         HandleMovement();
         UpdateFacingDirection();
+        UpdateAnimations();
+    }
+
+    private void UpdateAnimations()
+    {
+        if(_moveDir.x != 0f && _controller.State.IsGrounded)
+        {
+            ani.SetBool("walking", true);
+        } else
+        {
+            ani.SetBool("walking", false);
+        }
     }
 
     private void UpdateFacingDirection()
@@ -81,6 +97,10 @@ public class Player : MonoBehaviour
     private void HandleMovement()
     {
         var accelertionMultiplier = _controller.State.IsGrounded ? accelerationOnGround : accelerationInAir;
+        if(_controller.State.SlopeAngle > _controller.Parameters.SlopeLimit)
+        {
+            _moveDir = Vector2.zero;
+        }
         if (!_controller.State.IsDashing)
         {
             if (Mathf.Abs(_controller.MovementSpeed) <= maxSpeed * 1.05)
