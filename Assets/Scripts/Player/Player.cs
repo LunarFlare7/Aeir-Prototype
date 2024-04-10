@@ -108,13 +108,13 @@ public class Player : MonoBehaviour
                 _controller.SetHorizontalSpeed(Mathf.MoveTowards(_controller.MovementSpeed, _moveDir.x * maxSpeed, Time.deltaTime * accelertionMultiplier));
             }
 
-            if(Mathf.Abs(_controller.MovementSpeed) > maxSpeed * 1.05)
+            if(_controller.Velocity.magnitude > maxSpeed * 1.05)
             {
-                if(Mathf.Sign(_moveDir.x * _controller.MovementSpeed) == 1)
+                if((Mathf.Abs(_controller.Velocity.x) > _controller.Velocity.y) && Mathf.Sign(_moveDir.x * _controller.Velocity.x) == 1)
                 {
                     _controller.SetDrag(1f);
                 }
-                else
+                else if (!_controller.State.IsJumping)
                 {
                     _controller.SetDrag(3f);
                 }

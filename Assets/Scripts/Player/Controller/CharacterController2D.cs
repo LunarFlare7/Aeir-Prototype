@@ -137,6 +137,7 @@ public class CharacterController2D : MonoBehaviour
             _dashDir = dashDir;
             _dashDir.Normalize();
             State.IsDashing = true;
+            State.IsJumping = false;
             rb.velocity = _dashDir * Parameters.DashVelocity;
             SetDrag(Parameters.DashDrag);
             dashes -= 1;
