@@ -141,6 +141,7 @@ public class CharacterController2D : MonoBehaviour
             rb.velocity = _dashDir * Parameters.DashVelocity;
             SetDrag(Parameters.DashDrag);
             dashes -= 1;
+            //Debug.DrawRay(_transform.position, _dashDir, Color.red, Mathf.Infinity);
         }
     }
 
@@ -158,6 +159,7 @@ public class CharacterController2D : MonoBehaviour
         State.IsDashing = false;
         _dashTimer = 0;
         _dashDuration = 0;
+        //Debug.DrawRay(_transform.position, -_dashDir, Color.blue, Mathf.Infinity);
         SetDrag(0f);
     }
 
