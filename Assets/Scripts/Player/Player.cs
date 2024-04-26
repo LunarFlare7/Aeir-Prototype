@@ -22,6 +22,9 @@ public class Player : MonoBehaviour
     [Header("Animation")]
     public Animator ani;
 
+    [Header("Attack")]
+    public GameObject attackObject;
+
     private Vector2 _moveDir;
 
 
@@ -92,6 +95,11 @@ public class Player : MonoBehaviour
         {
             _controller.Dash(_moveDir);
         }
+
+        if(Input.GetMouseButtonDown(0))
+        {
+            Attack();
+        }
     }
 
     private void HandleMovement()
@@ -124,6 +132,19 @@ public class Player : MonoBehaviour
             {
                 _controller.SetDrag(0f);
             }
+        }
+
+    }
+
+    public void Attack()
+    {
+        attackObject.SetActive(true);
+        if(_moveDir.y > 0f)
+        {
+            attackObject.transform.eulerAngles = new Vector3(0, 0, 90f);
+        } else
+        {
+            attackObject.transform.eulerAngles = new Vector3(0, 0, 0);
         }
     }
 }

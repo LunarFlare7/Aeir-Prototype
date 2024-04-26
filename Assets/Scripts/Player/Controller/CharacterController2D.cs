@@ -73,7 +73,6 @@ public class CharacterController2D : MonoBehaviour
     void Awake()
     {
         State = new ControllerState2D();
-
         rb = GetComponent<Rigidbody2D>();
         _transform = transform;
         _collider = GetComponent<BoxCollider2D>();
