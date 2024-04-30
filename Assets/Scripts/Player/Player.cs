@@ -24,6 +24,8 @@ public class Player : MonoBehaviour
 
     [Header("Attack")]
     public GameObject attackObject;
+    public float attackSpeed;
+    private float attackTimer;
 
     private Vector2 _moveDir;
 
@@ -49,6 +51,15 @@ public class Player : MonoBehaviour
         HandleMovement();
         UpdateFacingDirection();
         UpdateAnimations();
+        TimerVariables();
+    }
+
+    private void TimerVariables()
+    {
+        if(attackTimer < attackSpeed)
+        {
+            attackTimer += Time.deltaTime;
+        }
     }
 
     private void UpdateAnimations()
@@ -96,7 +107,7 @@ public class Player : MonoBehaviour
             _controller.Dash(_moveDir);
         }
 
-        if(Input.GetMouseButtonDown(0))
+        if(Input.GetMouseButtonDown(0) && attackTimer >= attackSpeed)
         {
             Attack();
         }
@@ -141,10 +152,11 @@ public class Player : MonoBehaviour
         attackObject.SetActive(true);
         if(_moveDir.y > 0f)
         {
-            attackObject.transform.eulerAngles = new Vector3(0, 0, 90f);
+            attackObject.transform.eulerAngles = new Vector3(0, 0, 90f * (_isFacingRight ? 1 : -1f));
         } else
         {
             attackObject.transform.eulerAngles = new Vector3(0, 0, 0);
         }
+        attackTimer = 0;
     }
 }

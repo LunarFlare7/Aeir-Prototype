@@ -21,6 +21,7 @@ public class FloaterController : MonoBehaviour, IHittable
     public float speed;
     public float attackRate;
     private float attackTimer;
+    public GameObject deathEffect;
 
     [Header("Idle")]
     public float xSpeed;
@@ -66,6 +67,12 @@ public class FloaterController : MonoBehaviour, IHittable
         if (idle)
         {
             IdleMovement();
+        }
+
+        if (health <= 0)
+        {
+            Instantiate(deathEffect, transform.position, Quaternion.identity);
+            Destroy(this.gameObject);
         }
     }
 
