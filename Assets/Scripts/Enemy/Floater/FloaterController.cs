@@ -9,8 +9,10 @@ public class FloaterController : MonoBehaviour, IHittable
     public Transform target;
     public AIDestinationSetter destinationSetter;
     public AIPath path;
+    public bool preparingAttack;
     public bool attacking;
-    private bool idle;
+    public Animator ani;
+    public bool idle;
     //private LayerMask selfMask;
     private Rigidbody2D rb;
     private CircleCollider2D circleCollider;
@@ -20,11 +22,17 @@ public class FloaterController : MonoBehaviour, IHittable
     public float health;
     public float speed;
     public float attackRate;
+    private float attackRateTimer;
     private float attackTimer;
     public GameObject deathEffect;
     public float knockbackTime;
     private float knockbackTimer;
     public float knockbackMult;
+    public GameObject projectile;
+    public float projectileSpeed;
+
+    private float aniTime = 2f;
+    private float aniTimer;
 
     [Header("Idle")]
     public float xSpeed;
@@ -38,6 +46,7 @@ public class FloaterController : MonoBehaviour, IHittable
         destinationSetter = GetComponent<AIDestinationSetter>();
         path = GetComponent<AIPath>();
         destinationSetter.target = target;
+        ani = GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         circleCollider = GetComponent<CircleCollider2D>();
         //selfMask = ~LayerMask.GetMask(LayerMask.LayerToName(gameObject.layer));
@@ -52,9 +61,9 @@ public class FloaterController : MonoBehaviour, IHittable
         Vector3 right = circleCollider.bounds.max - (circleCollider.bounds.extents.y * Vector3.up);
         RaycastHit2D hitRight = Physics2D.Raycast(right, target.position - right, Mathf.Infinity, selfMask);
         Debug.DrawRay(right, target.position - right, Color.red);*/
-        if (path.reachedDestination)
+        if (path.reachedDestination && !preparingAttack)
         {
-            attacking = true;
+            preparingAttack = true;
             idle = true;
         }
         else
@@ -62,9 +71,27 @@ public class FloaterController : MonoBehaviour, IHittable
             idle = false;
         }
 
-        if (attacking)
+        if (preparingAttack && !attacking)
         {
-            //Debug.Log("attack");
+            attackRateTimer += Time.deltaTime;
+            if (attackRateTimer >= attackRate)
+            {
+                attackRateTimer = 0;
+                ani.SetTrigger("Attack");
+                attacking = true;
+                aniTimer = 0;
+            }
+        }
+
+
+        if(attacking)
+        {
+            aniTimer += Time.deltaTime;
+            if (aniTimer >= aniTime)
+            {
+                Attack();
+                attacking = false;
+            }
         }
 
         if (idle)
@@ -77,6 +104,12 @@ public class FloaterController : MonoBehaviour, IHittable
             Instantiate(deathEffect, transform.position, Quaternion.identity);
             Destroy(this.gameObject);
         }
+    }
+
+    public void Attack()
+    {
+        GameObject projAttack = Instantiate(projectile, transform.position, Quaternion.identity);
+        projAttack.GetComponent<Rigidbody2D>().velocity = (target.position - transform.position).normalized * projectileSpeed;
     }
 
     public void IdleMovement()
