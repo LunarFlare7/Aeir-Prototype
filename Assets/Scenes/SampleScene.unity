@@ -2089,7 +2089,7 @@ MonoBehaviour:
   accelerationInAir: 50
   handleInput: 1
   ani: {fileID: 1557336794}
-  attackObject: {fileID: 1653193444}
+  meleeAttack: {fileID: 1653193449}
   attackSpeed: 0.5
   jumpHeight: 5
 --- !u!114 &886787514
@@ -2628,6 +2628,8 @@ MonoBehaviour:
   speed: 5
   attackRate: 0
   deathEffect: {fileID: 4654636723330463127, guid: f37b1b0c42f1fe34799a9cea970e68c6, type: 3}
+  knockbackTime: 0.3
+  knockbackMult: 7
   xSpeed: 1
   ySpeed: 3
   xDist: 1
@@ -3213,7 +3215,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1653193445
 Transform:
   m_ObjectHideFlags: 0
@@ -3474,6 +3476,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 5
   attackTime: 0.2
+  dir: {x: 0, y: 0}
+  knockbackModifier: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

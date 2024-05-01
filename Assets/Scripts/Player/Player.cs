@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
 using UnityEngine.UIElements;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IHittable
 {
 
     private CharacterController2D _controller;
@@ -23,7 +23,7 @@ public class Player : MonoBehaviour
     public Animator ani;
 
     [Header("Attack")]
-    public GameObject attackObject;
+    public AttackManager meleeAttack;
     public float attackSpeed;
     private float attackTimer;
 
@@ -149,14 +149,14 @@ public class Player : MonoBehaviour
 
     public void Attack()
     {
-        attackObject.SetActive(true);
-        if(_moveDir.y > 0f)
-        {
-            attackObject.transform.eulerAngles = new Vector3(0, 0, 90f * (_isFacingRight ? 1 : -1f));
-        } else
-        {
-            attackObject.transform.eulerAngles = new Vector3(0, 0, 0);
-        }
+        meleeAttack.dir.y = _moveDir.y;
+        meleeAttack.dir.x = _isFacingRight ? 1 : -1;
+        meleeAttack.gameObject.SetActive(true);
         attackTimer = 0;
+    }
+
+    public void Hit(AttackManager atk)
+    {
+
     }
 }

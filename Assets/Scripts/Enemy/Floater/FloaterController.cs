@@ -22,6 +22,9 @@ public class FloaterController : MonoBehaviour, IHittable
     public float attackRate;
     private float attackTimer;
     public GameObject deathEffect;
+    public float knockbackTime;
+    private float knockbackTimer;
+    public float knockbackMult;
 
     [Header("Idle")]
     public float xSpeed;
@@ -61,7 +64,7 @@ public class FloaterController : MonoBehaviour, IHittable
 
         if (attacking)
         {
-            Debug.Log("attack");
+            //Debug.Log("attack");
         }
 
         if (idle)
@@ -79,11 +82,33 @@ public class FloaterController : MonoBehaviour, IHittable
     public void IdleMovement()
     {
         transform.position += new Vector3(Mathf.Sin(Time.time * xSpeed) * Time.deltaTime * xDist, Mathf.Cos(Time.time * ySpeed) * Time.deltaTime * yDist, 0);
-        Debug.Log("idle");
     }
 
-    public void Hit(float dmg)
+    public void Hit(AttackManager atk)
     {
-        health -= dmg;
+        health -= atk.damage;
+        StartCoroutine(TakeKnockback(atk.dir * atk.knockbackModifier * this.knockbackMult));
+    }
+
+    private IEnumerator TakeKnockback(Vector2 dir)
+    {
+        knockbackTimer = 0;
+        Vector2 startingDir = dir;
+        while (knockbackTimer <= knockbackTime)
+        {
+            transform.position += new Vector3(dir.x * Time.deltaTime, dir.y * Time.deltaTime, 0);
+            dir = Vector2.Lerp(startingDir, Vector2.zero, Mathf.Pow(knockbackTimer / knockbackTime, 2));
+            knockbackTimer += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!collision.collider.isTrigger)
+        {
+            Debug.Log("stop");
+            knockbackTimer = knockbackTime;
+        }
     }
 }
