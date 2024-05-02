@@ -12,7 +12,6 @@ public class FloaterController : MonoBehaviour, IHittable
     public bool preparingAttack;
     public bool attacking;
     public Animator ani;
-    public bool idle;
     //private LayerMask selfMask;
     private Rigidbody2D rb;
     private CircleCollider2D circleCollider;
@@ -23,16 +22,13 @@ public class FloaterController : MonoBehaviour, IHittable
     public float speed;
     public float attackRate;
     private float attackRateTimer;
-    private float attackTimer;
     public GameObject deathEffect;
+    public ParticleSystem hitEffect;
     public float knockbackTime;
     private float knockbackTimer;
     public float knockbackMult;
     public GameObject projectile;
     public float projectileSpeed;
-
-    private float aniTime = 2f;
-    private float aniTimer;
 
     [Header("Idle")]
     public float xSpeed;
@@ -64,11 +60,12 @@ public class FloaterController : MonoBehaviour, IHittable
         if (path.reachedDestination && !preparingAttack)
         {
             preparingAttack = true;
-            idle = true;
+            ani.SetBool("Idle", true);
         }
         else
         {
-            idle = false;
+            preparingAttack = false;
+            ani.SetBool("Idle", false);
         }
 
         if (preparingAttack && !attacking)
@@ -78,49 +75,33 @@ public class FloaterController : MonoBehaviour, IHittable
             {
                 attackRateTimer = 0;
                 ani.SetTrigger("Attack");
-                attacking = true;
-                aniTimer = 0;
             }
-        }
-
-
-        if(attacking)
-        {
-            aniTimer += Time.deltaTime;
-            if (aniTimer >= aniTime)
-            {
-                Attack();
-                attacking = false;
-            }
-        }
-
-        if (idle)
-        {
-            IdleMovement();
-        }
-
-        if (health <= 0)
-        {
-            Instantiate(deathEffect, transform.position, Quaternion.identity);
-            Destroy(this.gameObject);
         }
     }
 
     public void Attack()
     {
-        GameObject projAttack = Instantiate(projectile, transform.position, Quaternion.identity);
-        projAttack.GetComponent<Rigidbody2D>().velocity = (target.position - transform.position).normalized * projectileSpeed;
+        GameObject projAttack = Instantiate(projectile, transform.position, Quaternion.FromToRotation(Vector3.right, target.position - transform.position));
+        projAttack.GetComponent<Rigidbody2D>().velocity = ((Vector2)(target.position - transform.position) + Vector2.up*2).normalized * projectileSpeed;
+        attackRateTimer = 0;
     }
 
     public void IdleMovement()
     {
         transform.position += new Vector3(Mathf.Sin(Time.time * xSpeed) * Time.deltaTime * xDist, Mathf.Cos(Time.time * ySpeed) * Time.deltaTime * yDist, 0);
+        Debug.Log("idle");
     }
 
     public void Hit(AttackManager atk)
     {
         health -= atk.damage;
+        hitEffect.Play();
         StartCoroutine(TakeKnockback(atk.dir * atk.knockbackModifier * this.knockbackMult));
+        if (health <= 0)
+        {
+            Instantiate(deathEffect, transform.position, Quaternion.identity);
+            Destroy(this.gameObject);
+        }
     }
 
     private IEnumerator TakeKnockback(Vector2 dir)
@@ -140,7 +121,6 @@ public class FloaterController : MonoBehaviour, IHittable
     {
         if (!collision.collider.isTrigger)
         {
-            Debug.Log("stop");
             knockbackTimer = knockbackTime;
         }
     }
