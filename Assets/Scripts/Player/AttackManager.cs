@@ -16,7 +16,7 @@ public class AttackManager : MonoBehaviour
     {
         if (col.GetComponent<IHittable>() != null)
         {
-            col.GetComponent<IHittable>().Hit(this);
+            col.GetComponent<IHittable>().Hit(damage, dir, knockbackModifier);
         }
     }
 

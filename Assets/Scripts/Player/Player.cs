@@ -155,8 +155,8 @@ public class Player : MonoBehaviour, IHittable
         attackTimer = 0;
     }
 
-    public void Hit(AttackManager atk)
+    public void Hit(float dmg, Vector2 dir, float knockbackMult)
     {
-
+        Debug.Log("damage: " + dmg + ", dir: " + dir + ", kb mult: " + knockbackMult);
     }
 }

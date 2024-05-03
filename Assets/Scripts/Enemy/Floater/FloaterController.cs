@@ -89,14 +89,13 @@ public class FloaterController : MonoBehaviour, IHittable
     public void IdleMovement()
     {
         transform.position += new Vector3(Mathf.Sin(Time.time * xSpeed) * Time.deltaTime * xDist, Mathf.Cos(Time.time * ySpeed) * Time.deltaTime * yDist, 0);
-        Debug.Log("idle");
     }
 
-    public void Hit(AttackManager atk)
+    public void Hit(float dmg, Vector2 dir, float knockbackMult)
     {
-        health -= atk.damage;
+        health -= dmg;
         hitEffect.Play();
-        StartCoroutine(TakeKnockback(atk.dir * atk.knockbackModifier * this.knockbackMult));
+        StartCoroutine(TakeKnockback(dir * knockbackMult * this.knockbackMult));
         if (health <= 0)
         {
             Instantiate(deathEffect, transform.position, Quaternion.identity);

@@ -21,12 +21,18 @@ public class ProjectileManager : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, Vector2.SignedAngle(Vector2.right, target));
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D col)
     {
-        if(((1 << collision.gameObject.layer) & ground) != 0)
+        if(((1 << col.gameObject.layer) & ground) != 0)
         {
             rb.isKinematic = true;
-            transform.position = collision.GetContact(0).point;
+            rb.velocity = Vector3.zero;
+            transform.position = transform.position - new Vector3(0, 0.225f, 0);
+        }
+
+        if(col.GetComponent<IHittable>() != null)
+        {
+            col.GetComponent<IHittable>().Hit(1);
         }
     }
 }
