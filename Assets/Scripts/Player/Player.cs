@@ -79,13 +79,13 @@ public class Player : MonoBehaviour, IHittable
         {
             _isFacingRight = true;
             //remove when animations are added
-            transform.localScale = new Vector3(1, transform.localScale.y, transform.localScale.z);
+            transform.localEulerAngles = new Vector3(0, 0, 0);
         }
         else if (_controller.Velocity.x < 0)
         {
             _isFacingRight = false;
             //remove when animations are added
-            transform.localScale = new Vector3(-1, transform.localScale.y, transform.localScale.z);
+            transform.localEulerAngles = new Vector3(0, 180, 0);
         }
     }
 
@@ -149,8 +149,7 @@ public class Player : MonoBehaviour, IHittable
 
     public void Attack()
     {
-        meleeAttack.dir.y = _moveDir.y;
-        meleeAttack.dir.x = _isFacingRight ? 1 : -1;
+        meleeAttack.dir.Set(_isFacingRight ? 1 : -1, _moveDir.y);
         meleeAttack.gameObject.SetActive(true);
         attackTimer = 0;
     }

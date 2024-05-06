@@ -2,6 +2,7 @@ using Pathfinding;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public class FloaterController : MonoBehaviour, IHittable
@@ -12,9 +13,7 @@ public class FloaterController : MonoBehaviour, IHittable
     public bool preparingAttack;
     public bool attacking;
     public Animator ani;
-    //private LayerMask selfMask;
-    private Rigidbody2D rb;
-    private CircleCollider2D circleCollider;
+    public bool invincible;
 
     [Header("Settings")]
     public float maxHealth;
@@ -43,9 +42,6 @@ public class FloaterController : MonoBehaviour, IHittable
         path = GetComponent<AIPath>();
         destinationSetter.target = target;
         ani = GetComponent<Animator>();
-        rb = GetComponent<Rigidbody2D>();
-        circleCollider = GetComponent<CircleCollider2D>();
-        //selfMask = ~LayerMask.GetMask(LayerMask.LayerToName(gameObject.layer));
     }
 
     void Update()
@@ -82,7 +78,7 @@ public class FloaterController : MonoBehaviour, IHittable
     public void Attack()
     {
         GameObject projAttack = Instantiate(projectile, transform.position, Quaternion.FromToRotation(Vector3.right, target.position - transform.position));
-        projAttack.GetComponent<Rigidbody2D>().velocity = ((Vector2)(target.position - transform.position) + Vector2.up*2).normalized * projectileSpeed;
+        projAttack.GetComponent<Rigidbody2D>().velocity = ((Vector2)(target.position - transform.position) + Vector2.up).normalized * projectileSpeed;
         attackRateTimer = 0;
     }
 
@@ -93,8 +89,15 @@ public class FloaterController : MonoBehaviour, IHittable
 
     public void Hit(float dmg, Vector2 dir, float knockbackMult)
     {
+        if(invincible)
+        {
+            return;
+        }
         health -= dmg;
+        var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        hitEffect.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         hitEffect.Play();
+        invincible = true;
         StartCoroutine(TakeKnockback(dir * knockbackMult * this.knockbackMult));
         if (health <= 0)
         {
@@ -114,6 +117,7 @@ public class FloaterController : MonoBehaviour, IHittable
             knockbackTimer += Time.deltaTime;
             yield return null;
         }
+        invincible = false;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
