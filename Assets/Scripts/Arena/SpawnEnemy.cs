@@ -9,6 +9,7 @@ public class SpawnEnemy : MonoBehaviour
     public GameObject spriteParent;
     public SpriteRenderer spriteRenderer;
     public Transform target;
+    public ArenaController arena;
     public void Start()
     {
         spriteRenderer = enemy.GetComponentInChildren<SpriteRenderer>();
@@ -17,8 +18,12 @@ public class SpawnEnemy : MonoBehaviour
     }
     public void Spawn()
     {
-        FloaterController fl = Instantiate(enemy, transform.position, Quaternion.identity).GetComponent<FloaterController>();
-        fl.target = target;
+        Enemy e = Instantiate(enemy, transform.position, Quaternion.identity).GetComponent<Enemy>();
+        if(arena != null)
+        {
+            arena.currentEnemies.Add(e);
+        }
+        e.target = target;
         Destroy(this.gameObject);
     }
 }

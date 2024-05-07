@@ -2,32 +2,25 @@ using Pathfinding;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 
-public class FloaterController : MonoBehaviour, IHittable
+public class FloaterController : Enemy, IHittable
 {
-    public Transform target;
     public AIDestinationSetter destinationSetter;
     public AIPath path;
     public bool preparingAttack;
     public bool attacking;
     public Animator ani;
-    public bool invincible;
 
     [Header("Settings")]
-    public float maxHealth;
-    public float health;
-    public float speed;
-    public float attackRate;
-    private float attackRateTimer;
-    public GameObject deathEffect;
     public ParticleSystem hitEffect;
     public float knockbackTime;
     private float knockbackTimer;
-    public float knockbackMult;
     public GameObject projectile;
     public float projectileSpeed;
+    private float attackRateTimer;
 
     [Header("Idle")]
     public float xSpeed;
@@ -35,9 +28,9 @@ public class FloaterController : MonoBehaviour, IHittable
     public float xDist;
     public float yDist;
 
-    void Start()
+    new void Start()
     {
-        health = maxHealth;
+        base.Start();
         destinationSetter = GetComponent<AIDestinationSetter>();
         path = GetComponent<AIPath>();
         destinationSetter.target = target;
@@ -87,13 +80,9 @@ public class FloaterController : MonoBehaviour, IHittable
         transform.position += new Vector3(Mathf.Sin(Time.time * xSpeed) * Time.deltaTime * xDist, Mathf.Cos(Time.time * ySpeed) * Time.deltaTime * yDist, 0);
     }
 
-    public void Hit(float dmg, Vector2 dir, float knockbackMult)
+    public new void Hit(float dmg, Vector2 dir, float knockbackMult)
     {
-        if(invincible)
-        {
-            return;
-        }
-        health -= dmg;
+        base.Hit(dmg, dir, knockbackMult);
         var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
         hitEffect.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         hitEffect.Play();
@@ -120,11 +109,19 @@ public class FloaterController : MonoBehaviour, IHittable
         invincible = false;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D col)
     {
-        if (!collision.collider.isTrigger)
+        if (!col.collider.isTrigger)
         {
             knockbackTimer = knockbackTime;
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if(other.CompareTag("Player") && !other.isTrigger && other.GetComponent<IHittable>() != null)
+        {
+            other.GetComponent<IHittable>().Hit(1);
         }
     }
 }
