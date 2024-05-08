@@ -14,7 +14,7 @@ public class SpawnEnemy : MonoBehaviour
     {
         spriteRenderer = enemy.GetComponentInChildren<SpriteRenderer>();
         transform.AddComponent<SpriteRenderer>();
-        Instantiate(spriteRenderer, transform.position, Quaternion.identity, spriteParent.transform);
+        Instantiate(spriteRenderer, spriteParent.transform.position, Quaternion.identity, spriteParent.transform);
     }
     public void Spawn()
     {

@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 public class ArenaController : MonoBehaviour
 {
     public Transform target;
-    public GameObject door;
+    public Animator ani;
 
     public List<Wave> waves;
 
@@ -20,7 +20,7 @@ public class ArenaController : MonoBehaviour
         if (other.CompareTag("Player") && !other.isTrigger)
         {
             currentWave = 0;
-            door.SetActive(true);
+            ani.SetBool("Active", true);
             StartCoroutine(NextWave());
         }
     }
@@ -58,7 +58,7 @@ public class ArenaController : MonoBehaviour
         }
         else
         {
-             Destroy(door);
+            ani.SetBool("Active", false);
         }
     }
 }
