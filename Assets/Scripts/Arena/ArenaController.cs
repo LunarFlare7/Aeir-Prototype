@@ -9,6 +9,8 @@ public class ArenaController : MonoBehaviour
     public Transform target;
     public Animator ani;
 
+    private bool active = false;
+
     public List<Wave> waves;
 
     public List<Enemy> currentEnemies;
@@ -17,9 +19,10 @@ public class ArenaController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !other.isTrigger)
+        if (other.CompareTag("Player") && !other.isTrigger && !active)
         {
             currentWave = 0;
+            active = true;
             ani.SetBool("Active", true);
             StartCoroutine(NextWave());
         }

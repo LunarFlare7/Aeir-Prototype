@@ -67,9 +67,6 @@ public class CharacterController2D : MonoBehaviour
     private Vector2 _groundCheckPos;
     private ControllerParameters2D _overrideParameters;
 
-    //temporary
-    public bool grounded;
-
     void Awake()
     {
         State = new ControllerState2D();
@@ -93,8 +90,6 @@ public class CharacterController2D : MonoBehaviour
             DashUpdate();
             _dashDuration += Time.deltaTime;
         }
-
-        grounded = State.IsGrounded;
     }
 
     public void SetHorizontalSpeed(float x)
@@ -299,5 +294,10 @@ public class CharacterController2D : MonoBehaviour
     public void SetDrag(float drag)
     {
         rb.drag = drag;
+    }
+
+    public void Freeze()
+    {
+        rb.isKinematic = true;
     }
 }

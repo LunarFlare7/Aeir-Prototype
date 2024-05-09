@@ -121,7 +121,8 @@ public class FloaterController : Enemy, IHittable
     {
         if(other.CompareTag("Player") && !other.isTrigger && other.GetComponent<IHittable>() != null)
         {
-            other.GetComponent<IHittable>().Hit(1);
+            Vector2 dir = (other.transform.position - transform.position).normalized * Vector2.right;
+            other.GetComponent<IHittable>().Hit(1, dir);
         }
     }
 }

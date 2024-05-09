@@ -32,7 +32,8 @@ public class ProjectileManager : MonoBehaviour
 
         if(col.GetComponent<IHittable>() != null)
         {
-            col.GetComponent<IHittable>().Hit(1);
+            Vector2 dir = (col.transform.position - transform.position).normalized * Vector2.right;
+            col.GetComponent<IHittable>().Hit(1, dir);
         }
     }
 }

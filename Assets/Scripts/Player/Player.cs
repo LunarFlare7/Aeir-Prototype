@@ -11,8 +11,19 @@ public class Player : MonoBehaviour, IHittable
 {
 
     private CharacterController2D _controller;
+    public GameManager gm;
 
-    [Header("Move")]
+    [Header("Health")]
+    public float maxHealth;
+    public float health;
+    public bool invulnerable;
+    public float invulnerabilityTime;
+    public bool isHit;
+    public GameObject healthUI;
+    private List<GameObject> healthUIs;
+    public GameObject healthUIParent;
+
+    [Header("Move Settings")]
     private bool _isFacingRight;
     public float maxSpeed;
     public float accelerationOnGround;
@@ -20,7 +31,9 @@ public class Player : MonoBehaviour, IHittable
     public bool handleInput;
 
     [Header("Animation")]
-    public Animator ani;
+    public Animator spriteAni;
+    public ParticleSystem hitEffect;
+    public ParticleSystem deathEffect;
 
     [Header("Attack")]
     public AttackManager meleeAttack;
@@ -35,8 +48,17 @@ public class Player : MonoBehaviour, IHittable
 
     void Start()
     {
+        health = maxHealth;
         _controller = GetComponent<CharacterController2D>();
         _isFacingRight = transform.localScale.x > 0;
+        healthUIs = new List<GameObject>();
+        for(int i = 0; i < health; i++)
+        {
+            GameObject healthImage = Instantiate(healthUI);
+            healthImage.transform.SetParent(healthUIParent.transform, false);
+            healthImage.transform.localPosition = Vector2.right * 50 * i;
+            healthUIs.Add(healthImage);
+        }
     }
 
     void Update()
@@ -66,10 +88,10 @@ public class Player : MonoBehaviour, IHittable
     {
         if(_moveDir.x != 0f && _controller.State.IsGrounded)
         {
-            ani.SetBool("walking", true);
+            spriteAni.SetBool("Walking", true);
         } else
         {
-            ani.SetBool("walking", false);
+            spriteAni.SetBool("Walking", false);
         }
     }
 
@@ -120,7 +142,7 @@ public class Player : MonoBehaviour, IHittable
         {
             _moveDir = Vector2.zero;
         }
-        if (!_controller.State.IsDashing)
+        if (!_controller.State.IsDashing && !isHit)
         {
             if (Mathf.Abs(_controller.MovementSpeed) <= maxSpeed * 1.05)
             {
@@ -156,6 +178,65 @@ public class Player : MonoBehaviour, IHittable
 
     public void Hit(float dmg, Vector2 dir, float knockbackMult)
     {
-        Debug.Log("damage: " + dmg + ", dir: " + dir + ", kb mult: " + knockbackMult);
+        if(invulnerable)
+        {
+            return;
+        }
+        health -= dmg;
+        isHit = true;
+        invulnerable = true;
+        handleInput = false;
+        _controller.Move(Vector2.zero);
+        if (health <= 0f)
+        {
+            healthUIs.ForEach(obj => Destroy(obj));
+            Die();
+            return;
+        }
+        Destroy(healthUIs[(int)health]);
+        spriteAni.SetBool("Hit", true);
+        StartCoroutine(HitUpdate(dir));
+        hitEffect.Play();
+    }
+
+    public void Die()
+    {
+        deathEffect.Play();
+        _controller.Freeze();
+        spriteAni.SetTrigger("Death");
+        StartCoroutine(Restart());
+    }
+
+    IEnumerator HitUpdate(Vector2 hitDir)
+    {
+        float hitTime = 0.2f;
+        Vector2 moveDir = (hitDir + Vector2.up * 0.5f).normalized;
+        while (hitTime >= 0)
+        {
+            hitTime -= Time.deltaTime;
+            transform.position += (Vector3)moveDir * 5 * Time.deltaTime;
+            yield return null;
+        }
+        isHit = false;
+        handleInput = true;
+        float invulnTimer = invulnerabilityTime;
+        while(invulnTimer >= 0)
+        {
+            invulnTimer -= Time.deltaTime;
+            yield return null;
+        }
+        invulnerable = false;
+        spriteAni.SetBool("Hit", false);
+    }
+
+    IEnumerator Restart()
+    {
+        float restartTime = 2f;
+        while (restartTime >= 0)
+        {
+            restartTime -= Time.deltaTime;
+            yield return null;
+        }
+        gm.Restart();
     }
 }
