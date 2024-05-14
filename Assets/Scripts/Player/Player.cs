@@ -11,7 +11,9 @@ public class Player : MonoBehaviour, IHittable
 {
 
     private CharacterController2D _controller;
-    public GameManager gm;
+    private GameManager gm;
+    [Header("Info")]
+    public IItem selectedItem;
 
     [Header("Health")]
     public float maxHealth;
@@ -19,6 +21,7 @@ public class Player : MonoBehaviour, IHittable
     public bool invulnerable;
     public float invulnerabilityTime;
     public bool isHit;
+    public bool dead;
     public GameObject healthUI;
     private List<GameObject> healthUIs;
     public GameObject healthUIParent;
@@ -48,15 +51,16 @@ public class Player : MonoBehaviour, IHittable
 
     void Start()
     {
+        gm = GameManager.Instance;
         health = maxHealth;
         _controller = GetComponent<CharacterController2D>();
         _isFacingRight = transform.localScale.x > 0;
         healthUIs = new List<GameObject>();
-        for(int i = 0; i < health; i++)
+        for (int i = 0; i < maxHealth; i++)
         {
             GameObject healthImage = Instantiate(healthUI);
             healthImage.transform.SetParent(healthUIParent.transform, false);
-            healthImage.transform.localPosition = Vector2.right * 50 * i;
+            healthImage.transform.localPosition = Vector2.right * 60 * i;
             healthUIs.Add(healthImage);
         }
     }
@@ -66,19 +70,21 @@ public class Player : MonoBehaviour, IHittable
         if (handleInput)
         {
             HandleInputs();
-        } else
+        }
+        else
         {
             _moveDir = Vector2.zero;
         }
         HandleMovement();
         UpdateFacingDirection();
         UpdateAnimations();
+        UpdateHealthUI();
         TimerVariables();
     }
 
     private void TimerVariables()
     {
-        if(attackTimer < attackSpeed)
+        if (attackTimer < attackSpeed)
         {
             attackTimer += Time.deltaTime;
         }
@@ -86,10 +92,11 @@ public class Player : MonoBehaviour, IHittable
 
     private void UpdateAnimations()
     {
-        if(_moveDir.x != 0f && _controller.State.IsGrounded)
+        if (_moveDir.x != 0f && _controller.State.IsGrounded)
         {
             spriteAni.SetBool("Walking", true);
-        } else
+        }
+        else
         {
             spriteAni.SetBool("Walking", false);
         }
@@ -111,6 +118,19 @@ public class Player : MonoBehaviour, IHittable
         }
     }
 
+    private void UpdateHealthUI()
+    {
+        health = Mathf.Clamp(health, 0, maxHealth);
+        for (int i = 0; i < health; i++)
+        {
+            healthUIs[i].SetActive(true);
+        }
+        for(int i = (int)health; i < healthUIs.Count; i++)
+        {
+            healthUIs[i].SetActive(false);
+        }
+    }
+
     private void HandleInputs()
     {
         _moveDir.Set(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
@@ -122,6 +142,10 @@ public class Player : MonoBehaviour, IHittable
         else if (Input.GetKeyUp(KeyCode.Space) && _controller.State.IsJumping && !_controller.State.IsDashing)
         {
             _controller.CutJump();
+            if(Input.GetAxis("Jump") < 0.9f)
+            {
+                _controller.CutJump();
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.LeftShift) && (_moveDir.x != 0 || _moveDir.y != 0))
@@ -129,16 +153,21 @@ public class Player : MonoBehaviour, IHittable
             _controller.Dash(_moveDir);
         }
 
-        if(Input.GetMouseButtonDown(0) && attackTimer >= attackSpeed)
+        if (Input.GetMouseButtonDown(0) && attackTimer >= attackSpeed)
         {
             Attack();
+        }
+
+        if(selectedItem != null && Input.GetKeyDown(KeyCode.E))
+        {
+            selectedItem.Collect();
         }
     }
 
     private void HandleMovement()
     {
         var accelertionMultiplier = _controller.State.IsGrounded ? accelerationOnGround : accelerationInAir;
-        if(_controller.State.SlopeAngle > _controller.Parameters.SlopeLimit)
+        if (_controller.State.SlopeAngle > _controller.Parameters.SlopeLimit)
         {
             _moveDir = Vector2.zero;
         }
@@ -149,9 +178,9 @@ public class Player : MonoBehaviour, IHittable
                 _controller.SetHorizontalSpeed(Mathf.MoveTowards(_controller.MovementSpeed, _moveDir.x * maxSpeed, Time.deltaTime * accelertionMultiplier));
             }
 
-            if(_controller.Velocity.magnitude > maxSpeed * 1.05)
+            if (_controller.Velocity.magnitude > maxSpeed * 1.05)
             {
-                if((Mathf.Abs(_controller.Velocity.x) > _controller.Velocity.y) && Mathf.Sign(_moveDir.x * _controller.Velocity.x) == 1)
+                if ((Mathf.Abs(_controller.Velocity.x) > _controller.Velocity.y) && Mathf.Sign(_moveDir.x * _controller.Velocity.x) == 1)
                 {
                     _controller.SetDrag(1f);
                 }
@@ -159,7 +188,7 @@ public class Player : MonoBehaviour, IHittable
                 {
                     _controller.SetDrag(3f);
                 }
-                
+
             }
             else
             {
@@ -178,29 +207,32 @@ public class Player : MonoBehaviour, IHittable
 
     public void Hit(float dmg, Vector2 dir, float knockbackMult)
     {
-        if(invulnerable)
+        if (invulnerable)
         {
             return;
         }
         health -= dmg;
+        health = Mathf.Max(health, 0);
         isHit = true;
         invulnerable = true;
         handleInput = false;
         _controller.Move(Vector2.zero);
-        if (health <= 0f)
-        {
-            healthUIs.ForEach(obj => Destroy(obj));
-            Die();
-            return;
-        }
-        Destroy(healthUIs[(int)health]);
         spriteAni.SetBool("Hit", true);
         StartCoroutine(HitUpdate(dir));
         hitEffect.Play();
+        if (health <= 0f)
+        {
+            healthUIs.ForEach(obj => obj.SetActive(false));
+            health = 0;
+            Die();
+            return;
+        }
+        healthUIs[(int)health].SetActive(false);
     }
 
     public void Die()
     {
+        dead = true;
         deathEffect.Play();
         _controller.Freeze();
         spriteAni.SetTrigger("Death");
@@ -217,26 +249,51 @@ public class Player : MonoBehaviour, IHittable
             transform.position += (Vector3)moveDir * 5 * Time.deltaTime;
             yield return null;
         }
+
         isHit = false;
-        handleInput = true;
+        if (health > 0f)
+        {
+            handleInput = true;
+        }
         float invulnTimer = invulnerabilityTime;
-        while(invulnTimer >= 0)
+        while (invulnTimer >= 0)
         {
             invulnTimer -= Time.deltaTime;
             yield return null;
         }
-        invulnerable = false;
+
+        if (health > 0f)
+        {
+            invulnerable = false;
+        }
+
         spriteAni.SetBool("Hit", false);
     }
 
     IEnumerator Restart()
     {
-        float restartTime = 2f;
+        float restartTime = 3f;
         while (restartTime >= 0)
         {
             restartTime -= Time.deltaTime;
             yield return null;
         }
         gm.Restart();
+    }
+
+    void OnTriggerStay2D(Collider2D other)
+    {
+        if(other.GetComponent<IItem>() != null && other.isTrigger)
+        {
+            selectedItem = other.GetComponent<IItem>();
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if(other.GetComponent<IItem>() != null)
+        {
+            selectedItem = null;
+        }
     }
 }

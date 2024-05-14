@@ -73,7 +73,6 @@ public class CharacterController2D : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         _transform = transform;
         _collider = GetComponent<BoxCollider2D>();
-        rb.gravityScale = Parameters.GravityScale;
     }
 
     void LateUpdate()
@@ -113,7 +112,7 @@ public class CharacterController2D : MonoBehaviour
         if (_canJump)
         {
             State.IsJumping = true;
-            float jumpVelocity = Mathf.Sqrt(-2 * jumpHeight * (Physics2D.gravity.y * Parameters.GravityScale));
+            float jumpVelocity = Mathf.Sqrt(-2 * jumpHeight * (Physics2D.gravity.y * Parameters.RisingGravityScale));
             rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
             _jumpTimer = 0;
         }
@@ -252,10 +251,10 @@ public class CharacterController2D : MonoBehaviour
 
         if (State.IsOnSlope)
         {
-            rb.gravityScale = Parameters.GravityScale / 3;
+            rb.gravityScale = Parameters.RisingGravityScale / 3;
             if (State.SlopeAngle > Parameters.SlopeLimit)
             {
-                rb.gravityScale = Parameters.GravityScale;
+                rb.gravityScale = Parameters.RisingGravityScale;
             }
         }
         else if (State.IsGrounded || State.IsDashing)
@@ -264,7 +263,16 @@ public class CharacterController2D : MonoBehaviour
         }
         else
         {
-            rb.gravityScale = Parameters.GravityScale;
+            if(rb.velocity.y > 0f)
+            {
+                rb.gravityScale = Parameters.RisingGravityScale;
+            } else if (rb.velocity.y < 0f)
+            {
+                rb.gravityScale = Parameters.FallingGravityScale;
+            } else
+            {
+                rb.gravityScale = Parameters.RisingGravityScale;
+            }
         }
     }
 

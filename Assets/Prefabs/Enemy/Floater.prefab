@@ -53,23 +53,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac21810d30e606b4aabf907a7e6d4dd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHealth: 15
+  health: 15
+  speed: 5
+  knockbackMult: 7
+  invincible: 0
+  attackRate: 0.5
+  deathEffect: {fileID: 4654636723330463127, guid: f37b1b0c42f1fe34799a9cea970e68c6, type: 3}
+  arena: {fileID: 0}
   target: {fileID: 5923191640319070388, guid: 287f20de070b34d499fc93e48812eeaa, type: 3}
   destinationSetter: {fileID: 0}
   path: {fileID: 0}
   preparingAttack: 0
   attacking: 0
   ani: {fileID: 0}
-  invincible: 0
-  maxHealth: 15
-  health: 15
-  speed: 5
-  attackRate: 0.5
-  deathEffect: {fileID: 4654636723330463127, guid: f37b1b0c42f1fe34799a9cea970e68c6, type: 3}
   hitEffect: {fileID: 5170101046246304960}
   knockbackTime: 0.3
-  knockbackMult: 7
   projectile: {fileID: 3882271391089533948, guid: 3c7833fa9b14ef2459d35a56e9612159, type: 3}
   projectileSpeed: 9
+  aggroRange: 20
   xSpeed: 1
   ySpeed: 3
   xDist: 1

@@ -5047,8 +5047,8 @@ Transform:
   m_GameObject: {fileID: 2826028499823317326}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.0165, y: 0, z: 0}
-  m_LocalScale: {x: -0.46869472, y: 1.7875584, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: -0.4, y: 1.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5923191640319070388}
@@ -5066,7 +5066,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 5
-  attackTime: 0.2
+  attackTime: 0.1
   dir: {x: 0, y: 0}
   knockbackModifier: 1
 --- !u!1971053207 &7593068880875447385
@@ -5357,18 +5357,19 @@ MonoBehaviour:
   invulnerable: 0
   invulnerabilityTime: 1
   isHit: 0
+  dead: 0
   healthUI: {fileID: 0}
   healthUIParent: {fileID: 0}
-  maxSpeed: 12
-  accelerationOnGround: 100
-  accelerationInAir: 50
+  maxSpeed: 11
+  accelerationOnGround: 70
+  accelerationInAir: 45
   handleInput: 1
   spriteAni: {fileID: 6056836753125351226}
   hitEffect: {fileID: 4819423818494384928}
   deathEffect: {fileID: 0}
   meleeAttack: {fileID: 9013028194014730414}
-  attackSpeed: 0.5
-  jumpHeight: 5
+  attackSpeed: 0.4
+  jumpHeight: 6
 --- !u!114 &8446100095809777899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5383,7 +5384,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultParams:
     GroundCheckHeight: 0.02
-    GravityScale: 4
+    RisingGravityScale: 5
+    FallingGravityScale: 6
     MaxVel: {x: 3.4028235e+38, y: 3.4028235e+38}
     SlopeLimit: 30
     SlopeCheckHeight: 0.1

@@ -21,6 +21,7 @@ public class FloaterController : Enemy, IHittable
     public GameObject projectile;
     public float projectileSpeed;
     private float attackRateTimer;
+    public float aggroRange;
 
     [Header("Idle")]
     public float xSpeed;
@@ -33,7 +34,6 @@ public class FloaterController : Enemy, IHittable
         base.Start();
         destinationSetter = GetComponent<AIDestinationSetter>();
         path = GetComponent<AIPath>();
-        destinationSetter.target = target;
         ani = GetComponent<Animator>();
     }
 
@@ -46,9 +46,21 @@ public class FloaterController : Enemy, IHittable
         Vector3 right = circleCollider.bounds.max - (circleCollider.bounds.extents.y * Vector3.up);
         RaycastHit2D hitRight = Physics2D.Raycast(right, target.position - right, Mathf.Infinity, selfMask);
         Debug.DrawRay(right, target.position - right, Color.red);*/
-        if (path.reachedDestination && !preparingAttack)
+
+        if((transform.position - target.transform.position).magnitude < aggroRange)
         {
-            preparingAttack = true;
+            destinationSetter.target = target;
+        } else
+        {
+            destinationSetter.target = null;
+        }
+
+        if ((path.reachedDestination || destinationSetter.target == null) && !preparingAttack)
+        {
+            if(destinationSetter.target != null)
+            {
+                preparingAttack = true;
+            }      
             ani.SetBool("Idle", true);
         }
         else
@@ -66,6 +78,12 @@ public class FloaterController : Enemy, IHittable
                 ani.SetTrigger("Attack");
             }
         }
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(transform.position, aggroRange);
     }
 
     public void Attack()

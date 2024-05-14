@@ -21,6 +21,7 @@ public class Enemy : MonoBehaviour, IHittable
     public void Start()
     {
         health = maxHealth;
+        target = GameManager.Instance.player.transform;
     }
 
     public void Hit(float dmg, Vector2 dir, float kbMult)

@@ -19,7 +19,8 @@ public class ControllerParameters2D
     }
 
     public float GroundCheckHeight = 0.02f;
-    public float GravityScale;
+    public float RisingGravityScale;
+    public float FallingGravityScale;
     public Vector2 MaxVel = new Vector2(float.MaxValue, float.MaxValue);
 
     [Header("Slopes")]
