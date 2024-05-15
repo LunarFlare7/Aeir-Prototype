@@ -121,13 +121,17 @@ public class Player : MonoBehaviour, IHittable
     private void UpdateHealthUI()
     {
         health = Mathf.Clamp(health, 0, maxHealth);
-        for (int i = 0; i < health; i++)
+        for (int i = 0; i < healthUIs.Count; i++)
         {
-            healthUIs[i].SetActive(true);
-        }
-        for(int i = (int)health; i < healthUIs.Count; i++)
-        {
-            healthUIs[i].SetActive(false);
+            GameObject obj = healthUIs[i].transform.Find("Fill").gameObject;
+            if(i < health)
+            {
+                obj.SetActive(true);
+            }
+            else
+            {
+                obj.SetActive(false);
+            }
         }
     }
 
@@ -227,7 +231,6 @@ public class Player : MonoBehaviour, IHittable
             Die();
             return;
         }
-        healthUIs[(int)health].SetActive(false);
     }
 
     public void Die()

@@ -7,14 +7,16 @@ public class SpawnEnemy : MonoBehaviour
 {
     public GameObject enemy;
     public GameObject spriteParent;
-    public SpriteRenderer spriteRenderer;
+    public GameObject sprite;
     public Transform target;
     public ArenaController arena;
     public void Start()
     {
-        spriteRenderer = enemy.GetComponentInChildren<SpriteRenderer>();
-        transform.AddComponent<SpriteRenderer>();
-        Instantiate(spriteRenderer, spriteParent.transform.position, Quaternion.identity, spriteParent.transform);
+        if(enemy.transform.Find("Body").gameObject != null)
+        {
+            sprite = enemy.transform.Find("Body").gameObject;
+            Instantiate(sprite, spriteParent.transform.position, Quaternion.identity, spriteParent.transform);
+        }
     }
     public void Spawn()
     {

@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +8,7 @@ public sealed class GameManager : MonoBehaviour
 {
     public GameObject restartText;
     public Transform player;
+    public CinemachineVirtualCamera vCam;
     private bool restart;
 
     private static GameManager _instance;

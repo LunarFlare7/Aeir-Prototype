@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,8 +23,8 @@ public class RoomController : MonoBehaviour
     {
         if (other.CompareTag("Player") && !other.isTrigger)
         {
+            vcam.gameObject.SetActive(true);
             CharacterController2D controller = other.GetComponent<CharacterController2D>();
-            vcam.SetActive(true);
             if (affectPlayer)
             {
                 //change player values here
@@ -35,7 +36,7 @@ public class RoomController : MonoBehaviour
     {
         if (other.CompareTag("Player") && !other.isTrigger)
         {
-            vcam.SetActive(false);
+            vcam.gameObject.SetActive(false);
         }
     }
 }

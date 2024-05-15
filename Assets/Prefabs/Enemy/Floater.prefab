@@ -289,7 +289,7 @@ GameObject:
   - component: {fileID: 6528563731453129694}
   - component: {fileID: 3956158676005639370}
   m_Layer: 7
-  m_Name: Hexagon Pointed-Top
+  m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

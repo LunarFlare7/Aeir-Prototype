@@ -21,6 +21,10 @@ public class ArenaController : MonoBehaviour
     {
         if (other.CompareTag("Player") && !other.isTrigger && !active)
         {
+            if(waves.Count <= 0)
+            {
+                return;
+            }
             currentWave = 0;
             active = true;
             ani.SetBool("Active", true);
