@@ -10,7 +10,6 @@ public class Enemy : MonoBehaviour, IHittable
     public float speed;
     public float knockbackMult;
     public bool invincible;
-    public float attackRate;
     public GameObject deathEffect;
 
     public ArenaController arena;

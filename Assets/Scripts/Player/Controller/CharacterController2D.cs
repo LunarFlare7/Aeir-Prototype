@@ -166,8 +166,8 @@ public class CharacterController2D : MonoBehaviour
                 deltaMovement = rb.velocity;
                 return;
             }
-            Debug.DrawRay(_groundCheckPos, newPerpendicular, Color.red);
-            Debug.DrawRay(_groundCheckPos, Vector2.Reflect(newPerpendicular, _slopePerpendicular), Color.red);
+            Debug.DrawRay(_groundCheckPos, newPerpendicular, Color.blue);
+            Debug.DrawRay(_groundCheckPos, Vector2.Reflect(newPerpendicular, _slopePerpendicular), Color.blue);
             deltaMovement.Set(Mathf.Abs(deltaMovement.x) * newPerpendicular.x, Mathf.Abs(deltaMovement.x) * newPerpendicular.y);
         }
     }
@@ -221,7 +221,7 @@ public class CharacterController2D : MonoBehaviour
 
     private void SlopeCheck()
     {
-        RaycastHit2D slopeCheckHit = Physics2D.BoxCast(_groundCheckPos, new Vector2(_collider.size.x + 0.1f, Parameters.GroundCheckHeight), 0, Vector2.down, Parameters.SlopeCheckHeight, GroundMask) ;
+        RaycastHit2D slopeCheckHit = Physics2D.BoxCast(_groundCheckPos, new Vector2(_collider.size.x - 0.1f, Parameters.GroundCheckHeight), 0, Vector2.down, Parameters.SlopeCheckHeight, GroundMask) ;
         if (slopeCheckHit && (State.IsGrounded || !_awayFromSlope))
         {
             State.IsGrounded = true;
@@ -229,7 +229,7 @@ public class CharacterController2D : MonoBehaviour
             _slopePerpendicular = Vector2.Perpendicular(_slopeNormal).normalized;
             State.SlopeAngle = Vector2.Angle(_slopeNormal, Vector2.up);
 
-            if (Math.Abs(_slopeNormal.x) > 0.01f)
+            if (Math.Abs(_slopeNormal.x) > 0.1f)
             {
                 State.IsOnSlope = true;       
                 _awayFromSlope = false;

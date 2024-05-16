@@ -20,6 +20,7 @@ public class FloaterController : Enemy, IHittable
     private float knockbackTimer;
     public GameObject projectile;
     public float projectileSpeed;
+    public float attackRate;
     private float attackRateTimer;
     public float aggroRange;
 

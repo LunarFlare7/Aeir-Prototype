@@ -25,6 +25,7 @@ public class SpawnEnemy : MonoBehaviour
         {
             arena.currentEnemies.Add(e);
         }
+        e.arena = arena;
         e.target = target;
         Destroy(this.gameObject);
     }
