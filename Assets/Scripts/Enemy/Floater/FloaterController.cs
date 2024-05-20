@@ -15,7 +15,6 @@ public class FloaterController : Enemy, IHittable
     public Animator ani;
 
     [Header("Settings")]
-    public ParticleSystem hitEffect;
     public float knockbackTime;
     private float knockbackTimer;
     public GameObject projectile;
@@ -102,16 +101,8 @@ public class FloaterController : Enemy, IHittable
     public new void Hit(float dmg, Vector2 dir, float knockbackMult)
     {
         base.Hit(dmg, dir, knockbackMult);
-        var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-        hitEffect.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-        hitEffect.Play();
         invincible = true;
         StartCoroutine(TakeKnockback(dir * knockbackMult * this.knockbackMult));
-        if (health <= 0)
-        {
-            Instantiate(deathEffect, transform.position, Quaternion.identity);
-            Destroy(this.gameObject);
-        }
     }
 
     private IEnumerator TakeKnockback(Vector2 dir)

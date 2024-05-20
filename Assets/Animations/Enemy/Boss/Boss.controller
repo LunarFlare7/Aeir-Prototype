@@ -73,8 +73,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ae22621b6aece149b23cf53c02efe20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minLoopsBetweenAttacks: 1
-  maxLoopsBetweenAttacks: 2
+  minLoopsBetweenAttacks: 0.25
+  maxLoopsBetweenAttacks: 0.5
 --- !u!1102 &-7879839989294712650
 AnimatorState:
   serializedVersion: 6
@@ -411,7 +411,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0.25
   m_TransitionOffset: 0
   m_ExitTime: 0.75
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -510,7 +510,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fe02fe7e50a37b43a68528222f40b3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 15
+  speed: 30
   moveDir: 0
 --- !u!91 &9100000
 AnimatorController:

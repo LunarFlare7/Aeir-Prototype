@@ -11,6 +11,7 @@ public class Enemy : MonoBehaviour, IHittable
     public float knockbackMult;
     public bool invincible;
     public GameObject deathEffect;
+    public ParticleSystem hitEffect;
 
     public ArenaController arena;
 
@@ -30,5 +31,13 @@ public class Enemy : MonoBehaviour, IHittable
             return;
         }
         health -= dmg;
+        var angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        hitEffect.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        hitEffect.Play();
+        if (health <= 0)
+        {
+            Instantiate(deathEffect, transform.position, Quaternion.identity);
+            Destroy(this.gameObject);
+        }
     }
 }
